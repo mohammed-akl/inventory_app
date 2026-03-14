@@ -67,7 +67,8 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
                   final products = allProducts.where((p) {
                     final nameMatch = p.name.toLowerCase().contains(_searchQuery);
                     final skuMatch = p.sku?.toLowerCase().contains(_searchQuery) ?? false;
-                    return nameMatch || skuMatch;
+                    final descMatch = p.description?.toLowerCase().contains(_searchQuery) ?? false;
+                    return nameMatch || skuMatch || descMatch;
                   }).toList();
 
                   if (products.isEmpty) {
@@ -96,7 +97,19 @@ class _ProductsScreenState extends ConsumerState<ProductsScreen> {
                             product.name,
                             style: Theme.of(context).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold),
                           ),
-                          subtitle: product.sku != null ? Text('SKU: ${product.sku}') : null,
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (product.sku != null) Text('SKU: ${product.sku}'),
+                              if (product.description != null && product.description!.isNotEmpty) 
+                                Text(
+                                  product.description!, 
+                                  maxLines: 2, 
+                                  overflow: TextOverflow.ellipsis,
+                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey.shade600),
+                                ),
+                            ],
+                          ),
                           onTap: () {
                             context.push('/product-prices', extra: product);
                           },
